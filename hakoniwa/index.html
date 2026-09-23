@@ -145,6 +145,9 @@ button:disabled{cursor:not-allowed;opacity:.45}
 .lvbig{font-size:56px;font-weight:800;color:var(--xp);line-height:1;text-align:center}
 .unl{display:flex;flex-wrap:wrap;gap:8px}
 .unl span{background:var(--panel2);border-radius:12px;padding:6px 10px;font-size:13px;font-weight:700}
+#fatal{position:absolute;inset:0;display:grid;place-items:center;padding:16px;background:var(--sky);z-index:10}
+#fatal .mbox{text-align:center}
+#fatal code{display:block;font-size:12px;background:var(--panel2);border-radius:10px;padding:8px;word-break:break-all;text-align:left;color:var(--bad)}
 @media (prefers-reduced-motion:reduce){.bub.ready{animation:none}.float{animation-duration:.01s}}
 @media (max-width:420px){#hud{gap:6px;padding-left:10px;padding-right:10px}.pill{height:32px;font-size:13px;padding-right:9px}.lvl{padding-right:8px}.pill .ic{width:24px;height:24px;font-size:13px}.lvlbadge{width:26px;height:26px;font-size:13px}.xp{width:34px}.bigbtn{height:58px;min-width:104px;font-size:18px}}
 </style>
@@ -181,11 +184,29 @@ button:disabled{cursor:not-allowed;opacity:.45}
   </div>
   <div id="toast" role="status"></div>
   <div id="modal" hidden><div class="mbox" id="mbox"></div></div>
+  <div id="fatal"><div class="mbox"><h2 id="fatalTitle">街を読み込み中…</h2><p id="fatalMsg">3Dエンジンを準備しています。</p><code id="fatalCode" hidden></code><button class="act" id="fatalReload" hidden>再読み込み</button></div></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-(() => {
+function showFatal(title, msg, detail) {
+  const f = document.getElementById('fatal'); if (!f) return;
+  f.hidden = false;
+  document.getElementById('fatalTitle').textContent = title;
+  document.getElementById('fatalMsg').textContent = msg;
+  const c = document.getElementById('fatalCode');
+  if (detail) { c.textContent = detail; c.hidden = false; }
+  const r = document.getElementById('fatalReload'); r.hidden = false; r.onclick = () => location.reload();
+}
+function ensureThree(cb) {
+  if (window.THREE) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js';
+  s.onload = () => window.THREE ? cb() : showFatal('3Dエンジンを読み込めませんでした', '通信環境を確認して再読み込みしてください。');
+  s.onerror = () => showFatal('3Dエンジンを読み込めませんでした', 'three.js の配信サーバーに接続できません。通信環境を確認して再読み込みしてください。');
+  document.head.appendChild(s);
+}
+function startGame() {
 'use strict';
 
 /* ============================================================
@@ -401,7 +422,9 @@ function addXP(n) {
    three.js シーン
    ============================================================ */
 const canvas = $('#c');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true }); }
+catch (e) { showFatal('3D表示に対応していません', 'このブラウザでは WebGL が使えないようです。別のブラウザか端末でお試しください。', String(e && e.message || e)); return; }
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -1449,12 +1472,18 @@ function resize() {
   renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);
+if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
+let lastW = 0, lastH = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 window.addEventListener('pagehide', save);
 
 let last = performance.now(), tickAcc = 0, saveAcc = 0;
+let frameErr = false;
 function frame(now) {
+  requestAnimationFrame(frame);
   const dt = Math.min(.1, (now - last) / 1000); last = now;
+  if (canvas.clientWidth !== lastW || canvas.clientHeight !== lastH) { lastW = canvas.clientWidth; lastH = canvas.clientHeight; resize(); }
+  try {
   // カメラの補間
   cam.yaw += (cam.yawT - cam.yaw) * Math.min(1, dt * 8);
   cam.dist += (cam.distT - cam.dist) * Math.min(1, dt * 8);
@@ -1475,8 +1504,12 @@ function frame(now) {
   if (saveAcc > 4) { saveAcc = 0; save(); }
   renderer.render(scene, camera);
   positionBubbles();
-  requestAnimationFrame(frame);
+  if (!firstFrame) { firstFrame = true; document.getElementById('fatal').hidden = true; }
+  } catch (e) {
+    if (!frameErr) { frameErr = true; console.error(e); showFatal('エラーが発生しました', '下の内容を教えてください。', String(e && e.stack || e)); }
+  }
 }
+let firstFrame = false;
 
 /* ============================================================
    起動
@@ -1489,5 +1522,9 @@ resize(); updateCam(); updateHud(); refreshBubbles();
 for (let i = 0; i < 6; i++) spawnCar();
 requestAnimationFrame(frame);
 if (!loaded) setTimeout(() => toast('ようこそ市長！ 市役所をタップして税金を回収しましょう'), 600);
-})();
+}
+ensureThree(() => {
+  try { startGame(); }
+  catch (e) { console.error(e); showFatal('起動時にエラーが発生しました', '下の内容を教えてください。', String(e && e.stack || e)); }
+});
 </script>
