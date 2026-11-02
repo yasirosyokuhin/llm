@@ -249,7 +249,7 @@ const SK={
   clutch:{n:'チャンスに強い',d:'得点圏でカーソル+12%・パワー+8',t:'b'},
   first:{n:'初球狙い',d:'0-0のカウントでカーソル+20%',t:'b'},
   two:{n:'粘り打ち',d:'2ストライクからカーソル+15%',t:'b'},
-  eye:{n:'選球眼',d:'投球の到達点がうっすら見える',t:'b'},
+  eye:{n:'選球眼',d:'投球マーカーが最初から最終到達点を示す（変化球でずれない）',t:'b'},
   spd:{n:'俊足',d:'走力+12',t:'b'},
   pull:{n:'プルヒッター',d:'引っ張った打球の飛距離が伸びる',t:'b'},
   spray:{n:'広角打法',d:'タイミングの許容幅が30%広い',t:'b'},
@@ -1160,7 +1160,7 @@ function showTitle(){
 }
 function showHelp(){
   modal(`<h3>あそびかた</h3>
-  <div class="panel"><p><b>打撃（裏の攻撃）</b><br>黄色いミートカーソルを動かし、ボールがホームベースに来た瞬間にスイング。カーソルの芯でとらえるほど強い打球が飛ぶ。早めに振れば引っ張り、遅れると流し打ち。ボールがカーソルより上ならフライ、下ならゴロになる。<br>
+  <div class="panel"><p><b>打撃（裏の攻撃）</b><br>黄色いミートカーソルを動かし、ボールがホームベースに来た瞬間にスイング。カーソルの芯でとらえるほど強い打球が飛ぶ。早めに振れば引っ張り、遅れると流し打ち。ボールがカーソルより上ならフライ、下ならゴロになる。投げた瞬間からストライクゾーンに白い投球マーカーが出るので、そこにカーソルを合わせよう（変化球はマーカーが途中でずれていく）。<br>
   「強振」はカーソルが小さいかわりに飛距離が大きく伸びる。「バント」はカーソルを合わせておくだけで当たる。</p></div>
   <div class="panel"><p><b>操作</b><br>パソコン：マウスでカーソル移動、クリック/スペースでスイング（矢印キー・WASDでも移動、Qで強振、Bでバント）。<br>スマホ：画面をなぞってカーソル移動、右下のボタンでスイング。打球の再生中は画面タップで早送り。</p></div>
   <div class="panel"><p><b>投球（表の守備）</b><br>球種を選び、狙いのマークを投げたい所へ動かして「投げる」。縮んでいくリングが白い輪に重なった瞬間にもう一度押すと、コントロールが良くなり球速も上がる。打球は野手が自動で守る。</p></div>
@@ -2062,7 +2062,20 @@ function drawMark(){
   const m=M.mark;if(!m||now-m.t0>1500)return;const p=zpt(m.x,m.y);if(!p)return;const a=1-Math.max(0,(now-m.t0-1000)/500);
   ctx.save();ctx.globalAlpha=a;ctx.fillStyle=m.strike?'rgba(246,198,38,.9)':'rgba(120,200,255,.9)';ctx.strokeStyle='#0a1533';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,Math.max(5,BALLR*p.s),0,7);ctx.fill();ctx.stroke();ctx.restore();
 }
-function drawEye(){const b=M.ball;if(!b||b.state!=='fly'||b.z<0.4)return;if(!hasS(curBatter(),'eye'))return;const p=zpt(b.x,b.y);if(!p)return;ctx.strokeStyle='rgba(126,224,255,.85)';ctx.lineWidth=2;ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(p.x,p.y,BALLR*p.s*1.2,0,7);ctx.stroke();ctx.setLineDash([]);}
+function drawEye(){
+  const b=M.ball;if(!b||b.state!=='fly')return;
+  const eye=hasS(curBatter(),'eye');
+  let px,py;
+  if(eye){px=b.x;py=b.y;}
+  else{const k=Math.pow(clamp(b.z,0,1),2.3);px=b.x-b.brk.x*(1-k);py=b.y-b.brk.y*(1-k);}
+  const p=zpt(px,py);if(!p)return;const r=Math.max(7,BALLR*p.s*1.7);
+  const fade=clamp(b.z*6,0,1);
+  ctx.save();ctx.globalAlpha=fade;
+  ctx.lineWidth=4;ctx.strokeStyle='rgba(10,21,51,.7)';ctx.beginPath();ctx.arc(p.x,p.y,r,0,7);ctx.stroke();
+  ctx.lineWidth=2.5;ctx.strokeStyle=eye?'#7ee0ff':'#ffffff';ctx.beginPath();ctx.arc(p.x,p.y,r,0,7);ctx.stroke();
+  ctx.fillStyle=eye?'rgba(126,224,255,.35)':'rgba(255,255,255,.28)';ctx.beginPath();ctx.arc(p.x,p.y,r*0.55,0,7);ctx.fill();
+  ctx.restore();
+}
 let FW=[];
 function fireworks(){for(let i=0;i<7;i++)FW.push({t0:now+i*230,x:rnd(.12,.88),y:rnd(.1,.38),c:pick(['#f6c626','#ff5d7a','#7ee0ff','#ffffff','#9cff7a'])});}
 function drawFW(){FW=FW.filter(f=>{const u=(now-f.t0)/1200;if(u<0)return true;if(u>1)return false;ctx.fillStyle=f.c;ctx.globalAlpha=1-u;for(let i=0;i<28;i++){const a=i/28*Math.PI*2;const r=ease(Math.min(1,u*1.4))*Math.min(W,H)*0.17;ctx.beginPath();ctx.arc(f.x*W+Math.cos(a)*r,f.y*H+Math.sin(a)*r+u*u*40,2.6,0,7);ctx.fill();}ctx.globalAlpha=1;return true;});}
