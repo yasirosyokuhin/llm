@@ -541,7 +541,7 @@ function resolvePlay(bb,bat,side,bunt){
     P.dur=endT();P.res=res;return P;
   }
 
-  const groundBall=best&&!best.air&&best.f.i<=5&&(!fl.land||Math.hypot(fl.land.x,fl.land.z)<30);
+  const groundBall=best&&!best.air&&best.f.i<=5;
   if(groundBall){
     chase(best);
     const f=best.f,tf=best.t,pt=[best.s.x,best.s.z];
@@ -606,7 +606,7 @@ function resolvePlay(bb,bat,side,bunt){
   // ---- hit to the outfield (or a ball nobody caught) ----
   let f,tR,pt;
   if(best){chase(best);f=best.f;tR=best.t;pt=[best.s.x,best.s.z];}
-  else{const e=S[S.length-1];pt=[e.x,e.z];let bf=null,bt=1e9;for(const g of F){const t=reachT(g,Math.hypot(g.x-e.x,g.z-e.z),false);if(t<bt){bt=t;bf=g;}}f=bf;tR=Math.max(e.t,bt);moveF(f.i,pt,f.react,bt);P.ballEnd=e.t;P.holder=f.i;}
+  else{const e=S[S.length-1];pt=[e.x,e.z];let bf=null,bt=1e9;const deep=Math.hypot(e.x,e.z)>40;for(const g of F){if(deep&&g.i<6)continue;const t=reachT(g,Math.hypot(g.x-e.x,g.z-e.z),false);if(t<bt){bt=t;bf=g;}}f=bf;tR=Math.max(e.t,bt);moveF(f.i,pt,f.react,bt);P.ballEnd=e.t;P.holder=f.i;}
   const tb=b=>tR+0.6+d2(pt,BP[b%4])/f.arm;
   const tRun=(n,v,from,st)=>st+(n-from)*BL/v+0.22*Math.max(0,n-from-1);
   let nB=1;for(let n=2;n<=4;n++){if(tRun(n,vB,0,0.45)<tb(n)+0.15)nB=n;else break;}
@@ -631,7 +631,7 @@ function resolvePlay(bb,bat,side,bunt){
   P.throws.push({from:pt,to:BP[throwTo%4],t0:tR+0.6,t1:tb(throwTo),rcv});
   const code=nB===4?'IHR':['','1B','2B','3B'][nB];
   const text=nB===4?'ランニングホームラン！':nB===3?`${gapName(pt[0],pt[1])}を破るスリーベース`:nB===2?`${gapName(pt[0],pt[1])}へのツーベース`:
-    (best&&best.f.i<=5?`${FNAME[best.f.i]}の後方へポトリ`:fl.land&&Math.hypot(fl.land.x,fl.land.z)<55&&fl.maxY>6?`${hitDir(pt[0],pt[1])}前にポトリ`:`${hitDir(pt[0],pt[1])}前ヒット`);
+    (fl.land&&Math.hypot(fl.land.x,fl.land.z)<55&&fl.maxY>6?`${hitDir(pt[0],pt[1])}前にポトリ`:`${hitDir(pt[0],pt[1])}前ヒット`);
   Object.assign(res,{code,text:text+(outs?'　本塁タッチアウト！':''),outs,runs:outs0+outs>=3?0:runs,rbi:outs0+outs>=3?0:runs,bases:nb,batterBase:nB,kind:fl.maxY>6?'fly':'ground'});
   P.dur=endT();P.res=res;return P;
 }
