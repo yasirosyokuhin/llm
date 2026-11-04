@@ -730,7 +730,7 @@ function travelMs(v,type,pit){
   if(M.mode==='bat'){if(has('cam'))t*=1.1;if(type==='FB'&&(hasS(pit,'nobi')||hasS(pit,'g_nobi')))t*=.94;}
   return t;
 }
-const REL={x:-0.4,y:1.93,z:17.45};
+const REL={x:-0.35,y:2.08,z:17.45};
 
 /* CPU batter response (also used for auto batting) */
 function cpuResponse(bat,pit,pc,side){
@@ -1812,17 +1812,19 @@ function pitchPose(u){const p=keyedCR(PITCHK,u<0?0:Math.min(u,1.3));p.glove='L';
 /* right-handed batter: stance -> load -> stride -> hips -> shoulders -> contact (u=0.45) -> follow-through */
 function batterKeys(cy){
   const hy=(ZC+cy)/SC;
+  const F0={pL:[0.2,-1,0.6],kL:[0.35,0,1],kR:[-0.3,0,1]};
   return [
-    [0,   {pel:[0.04,0.55,-0.03],hipYaw:0.12,twist:0.2,lean:0.28,roll:0.03,fL:[-0.3,0.07,0.02],fLy:0.05,fR:[0.29,0.07,0],fRy:0.12,pL:[0.2,-1,0.6],pR:[1,-0.25,-0.25],kL:[0.35,0,1],kR:[-0.3,0,1],hyAbs:-1.5,hp:0.15,bh:[0.3,0.99,0.27],bd:[0.25,0.95,-0.14]}],
-    [0.2, {pel:[0.08,0.55,-0.03],hipYaw:0.28,twist:0.4,lean:0.28,roll:0.05,fL:[-0.34,0.13,0.03],fLy:0.15,fR:[0.29,0.07,0],fRy:0.12,pL:[0.2,-1,0.6],pR:[1,-0.2,-0.3],kL:[0.6,0.2,1],kR:[-0.3,0,1],hyAbs:-1.5,hp:0.15,bh:[0.37,1.01,0.24],bd:[0.36,0.92,-0.1]}],
-    [0.3, {pel:[-0.02,0.53,0],hipYaw:0.12,twist:0.36,lean:0.3,roll:0.02,fL:[-0.46,0.07,0.04],fLy:-0.2,fR:[0.29,0.07,0],fRy:0.12,pL:[0.1,-1,0.6],pR:[0.7,-0.7,-0.2],kL:[0.2,0,1],kR:[-0.3,0,1],hyAbs:-1.5,hp:0.18,bh:[0.26,0.98,0.31],bd:[0.6,0.78,0.08]}],
-    [0.4, {pel:[-0.07,0.52,0.01],hipYaw:-0.5,twist:-0.15,lean:0.3,roll:-0.1,fL:[-0.46,0.07,0.04],fLy:-0.4,fR:[0.28,0.08,0.01],fRy:-0.3,pL:[-0.4,-1,0.2],pR:[0.3,-1,0],kL:[-0.2,0.1,1],kR:[0,0,1],hyAbs:-1.4,hp:0.25,bh:[-0.05,hy+0.12,0.38],bd:[0.75,0.05,0.62]}],
-    [0.45,{pel:[-0.1,0.53,0.02],hipYaw:-1.1,twist:-0.75,lean:0.3,roll:-0.15,fL:[-0.46,0.07,0.04],fLy:-0.5,fR:[0.25,0.1,0.02],fRy:-0.9,pL:[-0.6,-0.6,0],pR:[0.2,-1,0.2],kL:[-0.3,0.1,1],kR:[-0.4,-0.2,1],hyAbs:-1.35,hp:0.28,bh:[-0.22,hy+0.07,0.42],bd:[0.05,-0.1,1]}],
-    [0.58,{pel:[-0.12,0.55,0.01],hipYaw:-1.3,twist:-1.15,lean:0.25,roll:-0.1,fL:[-0.46,0.07,0.04],fLy:-0.5,fR:[0.22,0.12,0.01],fRy:-1.2,pL:[-0.6,-0.4,-0.3],pR:[0,-1,0.4],kL:[-0.3,0.1,1],kR:[-0.6,-0.2,1],hyAbs:-1.3,hp:0.25,bh:[-0.45,hy*0.5+0.62,0.28],bd:[-0.8,0.15,0.55]}],
-    [0.78,{pel:[-0.12,0.57,0],hipYaw:-1.45,twist:-1.55,lean:0.15,roll:-0.05,fL:[-0.46,0.07,0.04],fLy:-0.5,fR:[0.18,0.13,0],fRy:-1.4,pL:[-0.4,0.6,-0.6],pR:[-0.3,0.2,0.8],kL:[-0.3,0.1,1],kR:[-0.8,-0.2,1],hyAbs:-1.3,hp:0.1,bh:[-0.55,1.16,-0.3],bd:[-0.2,0.45,-0.85]}],
-    [1.0, {pel:[-0.11,0.57,0],hipYaw:-1.5,twist:-1.7,lean:0.12,roll:0,fL:[-0.46,0.07,0.04],fLy:-0.5,fR:[0.17,0.13,0],fRy:-1.45,pL:[-0.3,0.8,-0.5],pR:[-0.4,0.3,0.8],kL:[-0.3,0.1,1],kR:[-0.8,-0.2,1],hyAbs:-1.25,hp:0,bh:[-0.34,1.34,-0.42],bd:[0.55,0.2,-0.8]}],
+    [0,   {pel:[0.04,0.55,-0.03],hipYaw:0.12,twist:0.22,lean:0.26,roll:0.03,fL:[-0.32,0.07,0.02],fLy:0.05,fR:[0.3,0.07,0],fRy:0.12,...F0,pR:[1,-0.3,-0.2],hyAbs:-1.5,hp:0.12,bh:[0.3,1.2,0.12],bd:[0.3,0.92,-0.15]}],
+    [0.2, {pel:[0.08,0.56,-0.03],hipYaw:0.3,twist:0.45,lean:0.26,roll:0.05,fL:[-0.34,0.15,0.03],fLy:0.15,fR:[0.3,0.07,0],fRy:0.12,...F0,kL:[0.6,0.2,1],pR:[1,-0.2,-0.3],hyAbs:-1.5,hp:0.12,bh:[0.37,1.24,0.08],bd:[0.4,0.9,-0.12]}],
+    [0.3, {pel:[-0.02,0.54,0],hipYaw:0.15,twist:0.42,lean:0.27,roll:0.02,fL:[-0.48,0.07,0.04],fLy:-0.2,fR:[0.3,0.07,0],fRy:0.12,pL:[0.1,-1,0.6],kL:[0.2,0,1],kR:[-0.3,0,1],pR:[0.8,-0.6,-0.2],hyAbs:-1.5,hp:0.14,bh:[0.34,1.2,0.12],bd:[0.5,0.84,0]}],
+    [0.39,{pel:[-0.06,0.53,0.01],hipYaw:-0.45,twist:0,lean:0.27,roll:-0.08,fL:[-0.48,0.07,0.04],fLy:-0.4,fR:[0.28,0.08,0.01],fRy:-0.2,pL:[-0.3,-1,0.3],kL:[-0.2,0.1,1],kR:[0,0,1],pR:[0.4,-1,0.1],hyAbs:-1.45,hp:0.2,bh:[0.12,hy+0.32,0.3],bd:[0.8,0.25,0.55]}],
+    [0.45,{pel:[-0.1,0.54,0.02],hipYaw:-1.1,twist:-0.75,lean:0.28,roll:-0.14,fL:[-0.48,0.07,0.04],fLy:-0.5,fR:[0.25,0.1,0.02],fRy:-0.9,pL:[-0.6,-0.6,0],kL:[-0.3,0.1,1],kR:[-0.4,-0.2,1],pR:[0.2,-1,0.2],hyAbs:-1.35,hp:0.28,bh:[-0.22,hy+0.08,0.42],bd:[0.05,-0.1,1]}],
+    [0.58,{pel:[-0.12,0.56,0.01],hipYaw:-1.3,twist:-1.15,lean:0.24,roll:-0.1,fL:[-0.48,0.07,0.04],fLy:-0.5,fR:[0.22,0.12,0.01],fRy:-1.2,pL:[-0.6,-0.4,-0.3],kL:[-0.3,0.1,1],kR:[-0.6,-0.2,1],pR:[0,-1,0.4],hyAbs:-1.3,hp:0.24,bh:[-0.47,hy*0.4+0.62,0.3],bd:[-0.8,0.15,0.55]}],
+    [0.78,{pel:[-0.12,0.58,0],hipYaw:-1.45,twist:-1.55,lean:0.15,roll:-0.05,fL:[-0.48,0.07,0.04],fLy:-0.5,fR:[0.18,0.13,0],fRy:-1.4,pL:[-0.4,0.6,-0.6],kL:[-0.3,0.1,1],kR:[-0.8,-0.2,1],pR:[-0.3,0.2,0.8],hyAbs:-1.3,hp:0.1,bh:[-0.48,1.28,-0.26],bd:[-0.2,0.45,-0.85]}],
+    [1.0, {pel:[-0.11,0.58,0],hipYaw:-1.5,twist:-1.7,lean:0.12,roll:0,fL:[-0.48,0.07,0.04],fLy:-0.5,fR:[0.17,0.13,0],fRy:-1.45,pL:[-0.3,0.8,-0.5],kL:[-0.3,0.1,1],kR:[-0.8,-0.2,1],pR:[-0.4,0.3,0.8],hyAbs:-1.25,hp:0,bh:[-0.32,1.42,-0.42],bd:[0.55,0.2,-0.8]}],
   ];
 }
+function swingU(u0,ms){if(ms<45)return lerp(u0,0.45,ms/45);const k=Math.min(1,(ms-45)/420);return 0.45+0.55*(1-(1-k)*(1-k));}
 const BUNTK={pel:[-0.02,0.47,0.06],hipYaw:-1.2,twist:-1.35,lean:0.3,roll:0,fL:[-0.25,0.07,0.18],fLy:-1.0,fR:[0.15,0.07,0.32],fRy:-1.0,pL:[-0.3,-1,-0.5],pR:[0.3,-1,-0.5],kL:[-1,0.1,0.4],kR:[-1,0.1,0.4],hyAbs:-1.45,hp:0.25};
 /* batter local <-> world: batter stands at (-1,0,0.12) with yaw pi/2 */
 const BAT0=[-1.0,0,0.12];
@@ -1852,7 +1854,8 @@ function smoothPose(id,tp,k){
 const YAWS=new Map();
 function smoothYaw(id,y,k){let c=YAWS.get(id);if(c==null||!k){YAWS.set(id,y);return y;}let d=y-c;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;c+=d*(1-Math.exp(-FDT*k));YAWS.set(id,c);return c;}
 /* ---------- character renderer ---------- */
-const SC=1.2;
+const SC=1.2,LG=1.25,ARM=1.15,HEADK=0.52,TOR=1.2;
+const liftY=(y)=>0.07+(y-0.07)*LG;
 function drawChar(o){
   const P=o.id?smoothPose(o.id,o.pose,o.k==null?14:o.k):o.pose;
   const yaw=o.id?smoothYaw(o.id,o.yaw||0,o.k==null?10:o.k):(o.yaw||0);
@@ -1863,16 +1866,16 @@ function drawChar(o){
   SHADOWS.push([o.x,o.z,0.42*SC]);
   const Rw=mul(mul(T(o.x,gy,o.z),RY(yaw)),S(SC,SC,SC));
   const DL=[];const add=(mesh,Mx,col,op)=>DL.push([mesh,Mx,col,op||{}]);
-  const pel=P.pel||[0,0.6,0];const tw=P.twist||0,hyw=P.hipYaw!=null?P.hipYaw:tw*0.4;
+  const pel0=P.pel||[0,0.6,0];const pel=[pel0[0],liftY(pel0[1]),pel0[2]];const dY=pel[1]-pel0[1];const up=h=>h&&[h[0],h[1]+dY+0.39*(TOR-1),h[2]];const ft=f=>f&&[f[0],liftY(f[1]),f[2]];const tw=P.twist||0,hyw=P.hipYaw!=null?P.hipYaw:tw*0.4;
   const Tp=mul(mul(Rw,T(pel[0],pel[1],pel[2])),RY(hyw));
   const tilt=m=>mul(mul(m,RX(P.lean||0)),RZ(P.roll||0));
   const Tmid=tilt(mul(Tp,RY((tw-hyw)*0.5)));
   const Tch=tilt(mul(Tp,RY(tw-hyw)));
   const toon={toon:1,spec:0.15};
-  add(CH.torso,mul(Tmid,TS(0,-0.11,0,1,0.57,1)),ONE,{tex:jerseyTex(L,o.num),toon:1,spec:0.12});
-  add(CH.lo,mul(Tch,TS(0,0.465,0.005,0.075,0.06,0.07)),C.skin,toon);
+  add(CH.torso,mul(Tmid,TS(0,-0.11*TOR,0,0.95,0.57*TOR,0.95)),ONE,{tex:jerseyTex(L,o.num),toon:1,spec:0.12});
+  add(CH.lo,mul(Tch,TS(0,0.465*TOR+0.02,0.005,0.068,0.075,0.064)),C.skin,toon);
   const hy=P.hyAbs!=null?P.hyAbs-tw:(P.hy||0);
-  const Th=mul(mul(mul(mul(Tch,T(0,0.665,0.015)),RY(hy)),RX(P.hp||0)),S(0.8,0.8,0.8));
+  const Th=mul(mul(mul(mul(Tch,T(0,0.47*TOR+0.04+0.262*HEADK,0.015)),RY(hy)),RX(P.hp||0)),S(HEADK,HEADK,HEADK));
   add(CH.sph,mul(Th,S(0.272,0.262,0.268)),ONE,{tex:faceTex(o.face||0,o.mask),toon:1,spec:0.08});
   if(o.helmet){
     add(CH.helmet,mul(Th,TS(0,0.02,-0.005,0.3,0.29,0.298)),L.cap,{toon:1,spec:1.2});
@@ -1886,8 +1889,8 @@ function drawChar(o){
   }
   // legs (attached to the pelvis, which turns with hipYaw)
   [[-1,P.fL,P.fLy,P.kL],[1,P.fR,P.fRy,P.kR]].forEach(([s,f,fy0,kp])=>{
-    const hip=xf(Tp,[s*0.1,-0.03,0]);const tgt=xf(Rw,f||[s*0.12,0.07,0]);
-    const pole=xd(Rw,kp||[s*0.25,0.15,1]);const {J,E}=ik2(hip,tgt,0.29*SC,0.27*SC,pole);
+    const hip=xf(Tp,[s*0.1,-0.03,0]);const tgt=xf(Rw,ft(f)||[s*0.12,0.07,0]);
+    const pole=xd(Rw,kp||[s*0.25,0.15,1]);const {J,E}=ik2(hip,tgt,0.29*SC*LG,0.27*SC*LG,pole);
     add(fru(0.82),cylM(hip,J,0.092*SC),hx(L.pants),{toon:1,spec:0.08});
     add(CH.lo,TS(J[0],J[1],J[2],0.076*SC,0.076*SC,0.076*SC),hx(L.pants),{toon:1,spec:0.08});
     const mid2=vadd(J,vsc(sub(E,J),0.45));
@@ -1898,10 +1901,10 @@ function drawChar(o){
     add(CH.lo,mul(sm,TS(0,-0.03,0.045,0.068,0.055,0.13)),C.shoe,{toon:1,spec:0.6});
   });
   // arms (shoulders follow the chest)
-  [[-1,P.hLw||xf(Rw,P.hL||[-0.25,0.62,0.04]),P.glove==='L',P.ball==='L',P.pL],[1,P.hRw||xf(Rw,P.hR||[0.25,0.62,0.04]),P.glove==='R',P.ball==='R',P.pR]].forEach(([s,tgt,gl0,ball,pp])=>{
-    const sh=xf(Tch,[s*0.205,0.39,0]);
-    const pole=xd(Rw,pp||[s*0.7,-0.5,-0.5]);const {J,E}=ik2(sh,tgt,0.245*SC,0.225*SC,pole);
-    add(CH.lo,TS(sh[0],sh[1],sh[2],0.068*SC,0.066*SC,0.068*SC),hx(L.jersey),{toon:1,spec:0.1});
+  [[-1,P.hLw||xf(Rw,up(P.hL)||[-0.25,0.62+dY,0.04]),P.glove==='L',P.ball==='L',P.pL],[1,P.hRw||xf(Rw,up(P.hR)||[0.25,0.62+dY,0.04]),P.glove==='R',P.ball==='R',P.pR]].forEach(([s,tgt,gl0,ball,pp])=>{
+    const sh=xf(Tch,[s*0.2,0.39*TOR,0]);
+    const pole=xd(Rw,pp||[s*0.7,-0.5,-0.5]);const {J,E}=ik2(sh,tgt,0.245*SC*ARM,0.225*SC*ARM,pole);
+    add(CH.lo,TS(sh[0],sh[1],sh[2],0.058*SC,0.056*SC,0.058*SC),hx(L.jersey),{toon:1,spec:0.1});
     add(fru(0.85),cylM(sh,J,0.06*SC),L.under,{toon:1,spec:0.12});
     add(CH.lo,TS(J[0],J[1],J[2],0.052*SC,0.052*SC,0.052*SC),L.under,{toon:1,spec:0.12});
     add(fru(0.85),cylM(J,E,0.051*SC),L.under,{toon:1,spec:0.12});
@@ -2031,7 +2034,7 @@ function drawActors(){
   if(live&&!pl&&!['banner','change','modal'].includes(M.phase)){
     const swingT=M.mode==='bat'?M.swingAnim:M.cpuSwingAnim;
     const bunt=M.bunt&&M.mode==='bat';
-    const u=window.__bu!=null?window.__bu:swingT?(M.mode==='bat'?(M.swU0||0.3):0.3)+(now-swingT)/280:preStride();
+    const u=window.__bu!=null?window.__bu:swingT?swingU(M.mode==='bat'?(M.swU0||0.3):0.3,now-swingT):preStride();
     const st=batterState(u,bunt,M.mode==='bat'?M.cursor:(M.ball?{x:M.ball.x,y:M.ball.y}:null));const bp=st.bp;
     const bt=curBatter();
     drawChar({id:'bat',x:BAT0[0],z:BAT0[2],yaw:Math.PI/2,look:La,helmet:true,gloves:true,num:M.idx[M.half]+1,pose:st.pose,face:faceOf(bt),k:swingT||window.__bu!=null?0:12});
